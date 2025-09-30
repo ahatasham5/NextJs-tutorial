@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { signIn } from '@/auth';
 import postgres from 'postgres';
 
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
@@ -74,6 +75,27 @@ export async function createInvoice(prevState: State, formData: FormData): Promi
 
   // Redirect to the invoices page
   redirect('/dashboard/invoices');
+}
+
+export async function authenticate(
+  prevState: string | undefined,
+  formData: FormData,
+) {
+  try {
+    const result = await signIn('credentials', {
+      email: formData.get('email'),
+      password: formData.get('password'),
+      redirect: false,
+    });
+
+    if (result?.error) {
+      return 'Invalid credentials.';
+    }
+
+    return undefined;
+  } catch (error) {
+    return 'Authentication failed.';
+  }
 }
 
 export async function deleteInvoice(id: string) {
