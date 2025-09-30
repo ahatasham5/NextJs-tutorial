@@ -160,7 +160,8 @@ export async function fetchInvoiceById(id: string) {
       amount: invoice.amount / 100,
     }));
 
-    return invoice[0];
+    // Return null if no invoice found instead of throwing error
+    return invoice.length > 0 ? invoice[0] : null;
   } catch (error) {
     console.error('Database Error:', error);
     throw new Error('Failed to fetch invoice.');
